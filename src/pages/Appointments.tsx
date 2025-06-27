@@ -1,4 +1,3 @@
-
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,10 +56,18 @@ const Appointments = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Appointment form submitted:", formData);
+    
+    // Dispatch custom event to notify admin panel
+    const appointmentEvent = new CustomEvent('newAppointment', {
+      detail: formData
+    });
+    window.dispatchEvent(appointmentEvent);
+    
     toast({
       title: "Appointment Request Submitted!",
       description: "We'll contact you within 24 hours to confirm your appointment.",
     });
+    
     // Reset form
     setFormData({
       firstName: "",
