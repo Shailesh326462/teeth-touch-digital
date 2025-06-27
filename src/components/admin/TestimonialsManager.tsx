@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,11 @@ const TestimonialsManager = ({ testimonials, onAdd, onDelete }: TestimonialsMana
     date: new Date().toISOString().split('T')[0],
     isActive: true
   });
+
+  // Sync testimonials to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('adminTestimonials', JSON.stringify(testimonials));
+  }, [testimonials]);
 
   const handleAddTestimonial = () => {
     if (newTestimonial.name && newTestimonial.comment) {

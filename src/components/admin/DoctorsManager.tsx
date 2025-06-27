@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,11 @@ const DoctorsManager = ({ doctors, onAdd, onDelete }: DoctorsManagerProps) => {
     bio: "",
     isActive: true
   });
+
+  // Sync doctors to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('adminDoctors', JSON.stringify(doctors));
+  }, [doctors]);
 
   const handleAddDoctor = () => {
     if (newDoctor.name && newDoctor.specialization) {
