@@ -1,45 +1,38 @@
 
-import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GraduationCap, Award, Clock } from "lucide-react";
+import { GraduationCap, Award, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const Doctors = () => {
-  const [doctors, setDoctors] = useState([]);
-
-  // Load doctors from localStorage (simulating data from admin)
-  useEffect(() => {
-    const savedDoctors = localStorage.getItem('adminDoctors');
-    if (savedDoctors) {
-      setDoctors(JSON.parse(savedDoctors));
-    } else {
-      // Default doctors if none exist
-      setDoctors([
-        {
-          id: 1,
-          name: "Dr. Sarah Smith",
-          specialization: "General Dentistry",
-          experience: "15 years",
-          education: "DDS from Harvard School of Dental Medicine",
-          bio: "Dr. Smith is passionate about providing comprehensive dental care with a gentle touch.",
-          isActive: true
-        },
-        {
-          id: 2,
-          name: "Dr. Michael Johnson",
-          specialization: "Orthodontics",
-          experience: "12 years",
-          education: "DDS, MS in Orthodontics from UCLA",
-          bio: "Specializing in creating beautiful smiles through advanced orthodontic treatments.",
-          isActive: true
-        }
-      ]);
+  const { data: doctors = [], isLoading } = useQuery({
+    queryKey: ['doctors'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('doctors')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
     }
-  }, []);
+  });
 
-  const activeDoctors = doctors.filter(d => d.isActive);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center">Loading doctors...</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -56,84 +49,68 @@ const Doctors = () => {
           </p>
         </div>
 
-        {activeDoctors.length > 0 ? (
+        {doctors.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {activeDoctors.map((doctor) => (
+            {doctors.map((doctor) => (
               <Card key={doctor.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center">
-                  <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">
-                      {doctor.name.split(' ').map(n => n[0]).join('')}
-                    </span>
+                  <div className="flex justify-center mb-4">
+                    <div className="bg-blue-600 text-white p-6 rounded-full">
+                      <User className="h-12 w-12" />
+                    </div>
                   </div>
                   <CardTitle className="text-xl">{doctor.name}</CardTitle>
-                  <Badge variant="outline" className="w-fit mx-auto">
+                  <Badge variant="secondary" className="mx-auto">
                     {doctor.specialization}
                   </Badge>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Clock className="h-4 w-4" />
-                    <span>{doctor.experience} of experience</span>
-                  </div>
+                  {doctor.experience && (
+                    <div className="flex items-center space-x-3">
+                      <Award className="h-5 w-5 text-blue-600" />
+                      <div>
+                        <p className="font-semibold text-sm">Experience</p>
+                        <p className="text-gray-600 text-sm">{doctor.experience}</p>
+                      </div>
+                    </div>
+                  )}
                   
-                  <div className="flex items-start space-x-2 text-sm text-gray-600">
-                    <GraduationCap className="h-4 w-4 mt-0.5" />
-                    <span>{doctor.education}</span>
-                  </div>
+                  {doctor.education && (
+                    <div className="flex items-center space-x-3">
+                      <GraduationCap className="h-5 w-5 text-blue-600" />
+                      <div>
+                        <p className="font-semibold text-sm">Education</p>
+                        <p className="text-gray-600 text-sm">{doctor.education}</p>
+                      </div>
+                    </div>
+                  )}
                   
-                  <div className="flex items-start space-x-2 text-sm text-gray-700">
-                    <Award className="h-4 w-4 mt-0.5" />
-                    <span>{doctor.bio}</span>
-                  </div>
-                  
-                  <div className="pt-4 border-t">
-                    <a
-                      href="/appointments"
-                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors inline-block text-center"
-                    >
-                      Book Appointment
-                    </a>
-                  </div>
+                  {doctor.bio && (
+                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-sm text-gray-700">{doctor.bio}</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">No doctors information available at the moment.</p>
+            <p className="text-gray-600 text-lg">No doctors available at the moment.</p>
           </div>
         )}
 
-        {/* Why Choose Our Doctors Section */}
-        <div className="mt-16">
-          <div className="bg-white py-12 px-8 rounded-2xl shadow-lg">
-            <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">
-              Why Choose Our Doctors?
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <GraduationCap className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Expert Qualifications</h3>
-                <p className="text-gray-600">All our doctors have advanced degrees from prestigious institutions.</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Award className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Proven Experience</h3>
-                <p className="text-gray-600">Years of experience in their respective specializations.</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="h-8 w-8 text-purple-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Dedicated Care</h3>
-                <p className="text-gray-600">Committed to providing personalized, compassionate care.</p>
-              </div>
-            </div>
+        {/* Call to Action */}
+        <div className="mt-16 text-center">
+          <div className="bg-blue-600 text-white py-12 px-8 rounded-2xl">
+            <h2 className="text-3xl font-bold mb-4">Ready to Meet Our Team?</h2>
+            <p className="text-xl mb-8">Schedule your appointment today and experience professional dental care.</p>
+            <a
+              href="/appointments"
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block"
+            >
+              Book Your Appointment
+            </a>
           </div>
         </div>
       </div>

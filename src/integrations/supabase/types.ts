@@ -9,7 +9,228 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          created_at: string | null
+          date_of_birth: string | null
+          email: string
+          first_name: string
+          id: string
+          is_new_patient: boolean | null
+          last_name: string
+          medical_conditions: string | null
+          medications: string | null
+          phone: string
+          preferred_date: string | null
+          preferred_time: string | null
+          reason_for_visit: string | null
+          service_type: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date_of_birth?: string | null
+          email: string
+          first_name: string
+          id?: string
+          is_new_patient?: boolean | null
+          last_name: string
+          medical_conditions?: string | null
+          medications?: string | null
+          phone: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          reason_for_visit?: string | null
+          service_type?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          is_new_patient?: boolean | null
+          last_name?: string
+          medical_conditions?: string | null
+          medications?: string | null
+          phone?: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          reason_for_visit?: string | null
+          service_type?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          status: string | null
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          status?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          status?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      doctors: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          education: string | null
+          experience: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          specialization: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          education?: string | null
+          experience?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          education?: string | null
+          experience?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          duration: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          price: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          price?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          price?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          comment: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          rating: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          comment: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          comment?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

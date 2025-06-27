@@ -8,39 +8,44 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { signIn } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login process
-    setTimeout(() => {
-      if (credentials.email && credentials.password) {
-        // Store user session (simplified)
-        localStorage.setItem("userAuth", "true");
-        localStorage.setItem("userEmail", credentials.email);
-        
+    try {
+      const { error } = await signIn(credentials.email, credentials.password);
+      
+      if (error) {
+        toast({
+          title: "Login Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
         toast({
           title: "Login Successful",
           description: "Welcome back to Smile Dental!",
         });
-        
         navigate("/");
-      } else {
-        toast({
-          title: "Login Failed",
-          description: "Please fill in all fields.",
-          variant: "destructive",
-        });
       }
+    } catch (error) {
+      toast({
+        title: "Login Failed",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -100,11 +105,6 @@ const Login = () => {
                     Sign up here
                   </Link>
                 </p>
-              </div>
-              
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-                <p className="text-blue-800"><strong>Demo Login:</strong></p>
-                <p className="text-blue-700">Use any email and password to login</p>
               </div>
             </CardContent>
           </Card>

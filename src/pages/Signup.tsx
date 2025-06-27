@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { signUp } = useAuth();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,29 +39,46 @@ const Signup = () => {
       return;
     }
 
-    // Simulate signup process
-    setTimeout(() => {
-      if (formData.firstName && formData.lastName && formData.email && formData.password) {
-        // Store user session (simplified)
-        localStorage.setItem("userAuth", "true");
-        localStorage.setItem("userEmail", formData.email);
-        localStorage.setItem("userName", `${formData.firstName} ${formData.lastName}`);
-        
-        toast({
-          title: "Account Created",
-          description: "Welcome to Smile Dental! Your account has been created successfully.",
-        });
-        
-        navigate("/");
-      } else {
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { error } = await signUp(
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName
+      );
+
+      if (error) {
         toast({
           title: "Signup Failed",
-          description: "Please fill in all required fields.",
+          description: error.message,
           variant: "destructive",
         });
+      } else {
+        toast({
+          title: "Account Created",
+          description: "Please check your email to verify your account.",
+        });
+        navigate("/login");
       }
+    } catch (error) {
+      toast({
+        title: "Signup Failed",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {

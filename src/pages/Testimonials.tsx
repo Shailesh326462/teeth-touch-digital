@@ -4,39 +4,35 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Quote } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const Testimonials = () => {
-  const [testimonials, setTestimonials] = useState([]);
-
-  // Load testimonials from localStorage (simulating data from admin)
-  useEffect(() => {
-    const savedTestimonials = localStorage.getItem('adminTestimonials');
-    if (savedTestimonials) {
-      setTestimonials(JSON.parse(savedTestimonials));
-    } else {
-      // Default testimonials if none exist
-      setTestimonials([
-        {
-          id: 1,
-          name: "Sarah Johnson",
-          rating: 5,
-          comment: "Excellent service! Dr. Smith was very professional and made me feel comfortable.",
-          date: "2024-01-15",
-          isActive: true
-        },
-        {
-          id: 2,
-          name: "Mike Davis",
-          rating: 5,
-          comment: "Best dental experience I've ever had. Highly recommend!",
-          date: "2024-01-10",
-          isActive: true
-        }
-      ]);
+  const { data: testimonials = [], isLoading } = useQuery({
+    queryKey: ['testimonials'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
     }
-  }, []);
+  });
 
-  const activeTestimonials = testimonials.filter(t => t.isActive);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center">Loading testimonials...</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -53,9 +49,9 @@ const Testimonials = () => {
           </p>
         </div>
 
-        {activeTestimonials.length > 0 ? (
+        {testimonials.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {activeTestimonials.map((testimonial) => (
+            {testimonials.map((testimonial) => (
               <Card key={testimonial.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
@@ -75,7 +71,7 @@ const Testimonials = () => {
                   <div className="border-t pt-4">
                     <p className="font-semibold text-gray-800">{testimonial.name}</p>
                     <p className="text-sm text-gray-500">
-                      {new Date(testimonial.date).toLocaleDateString()}
+                      {new Date(testimonial.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </CardContent>
